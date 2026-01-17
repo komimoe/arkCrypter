@@ -12,7 +12,7 @@ arkCrypter
 							*Not removing this part is appreciated*
 ____________________________________________________________________________________________________________*/
 
-#include "oxorany_include.h"
+#include "skCrypter.h"
 
 #ifdef _KERNEL_MODE
 namespace std
@@ -28,7 +28,37 @@ namespace std
 }
 #endif
 
-#define lifeCrypter(__sth) oxorany(__sth)
+template<typename T> class LifetimeText
+{
+	T t;
+
+public:
+	LifetimeText(T&& t) : t { std::move(t) }
+	{
+	}
+
+	LifetimeText(T& t) : t { t }
+	{
+	}
+
+	~LifetimeText()
+	{
+		t.clear();
+	}
+
+	operator skc::clean_type<decltype(t[0]) >* ()
+	{
+		return t;
+	}
+
+	T& v()
+	{
+		return t;
+	}
+
+};
+
+#define lifeCrypter(__sth) LifetimeText(skCrypt(__sth))
 
 /*________________________________________________________________________________
 
